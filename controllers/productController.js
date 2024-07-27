@@ -2,7 +2,7 @@ const Product = require("../models/Product");
 
 // crear nuevos productos
 exports.create = async (req, res) => {
-    const { name, category, subCategory, price, images, stockInfo } = req.body;
+    const { name, category, subCategory, price, images, stockInfo, description } = req.body;
 
     try {
         const existingProduct = await Product.findOne({ name })
@@ -10,7 +10,7 @@ exports.create = async (req, res) => {
             return res.status(400).json({ errorMessage: 'Ya existe un producto con ese nombre' });
         }
 
-        const newProduct = new Product({ name, category, subCategory, price, images, stockInfo });
+        const newProduct = new Product({ name, category, subCategory, price, images, stockInfo, description });
         await newProduct.save();
         return res.status(201).json({ message: 'Nuevo producto registrado', status: 201 });
     } catch (err) {
@@ -20,7 +20,7 @@ exports.create = async (req, res) => {
 
 // actualizar productos
 exports.update = async (req, res) => {
-    const { name, category, subCategory, price, images, stockInfo } = req.body;
+    const { name, category, subCategory, price, images, stockInfo, description } = req.body;
     const { id } = req.params;
 
     if (!id) {
@@ -39,6 +39,7 @@ exports.update = async (req, res) => {
         existingProduct.price = price || existingProduct.price;
         existingProduct.images = images || existingProduct.images;
         existingProduct.stockInfo  = stockInfo || existingProduct.stockInfo;
+        existingProduct.description  = description || existingProduct.description;
 
         await existingProduct.save();
 
