@@ -2,7 +2,7 @@ const Product = require("../models/Product");
 
 // crear nuevos productos
 exports.create = async (req, res) => {
-    const { name, category, price, images, stockInfo } = req.body;
+    const { name, category, subCategory, price, images, stockInfo } = req.body;
 
     try {
         const existingProduct = await Product.findOne({ name })
@@ -10,7 +10,7 @@ exports.create = async (req, res) => {
             return res.status(400).json({ errorMessage: 'Ya existe un producto con ese nombre' });
         }
 
-        const newProduct = new Product({ name, category, price, images, stockInfo });
+        const newProduct = new Product({ name, category, subCategory, price, images, stockInfo });
         await newProduct.save();
         return res.status(201).json({ message: 'Nuevo producto registrado', status: 201 });
     } catch (err) {
@@ -20,7 +20,7 @@ exports.create = async (req, res) => {
 
 // actualizar productos
 exports.update = async (req, res) => {
-    const { name, category, price, images, stockInfo } = req.body;
+    const { name, category, subCategory, price, images, stockInfo } = req.body;
     const { id } = req.params;
 
     if (!id) {
@@ -35,6 +35,7 @@ exports.update = async (req, res) => {
 
         existingProduct.name = name || existingProduct.name;
         existingProduct.category = category || existingProduct.category;
+        existingProduct.subCategory = subCategory || existingProduct.subCategory;
         existingProduct.price = price || existingProduct.price;
         existingProduct.images = images || existingProduct.images;
         existingProduct.stockInfo  = stockInfo || existingProduct.stockInfo;
@@ -72,7 +73,7 @@ exports.getAll = async (req, res) => {
     try {
         const products = await Product.find()
         return res.status(201).json({ data: products, status: 201 });
-    } catch (error) {
+    } catch (err) {
         return res.status(400).json({ message: `Error al cargar todos los productos, ${err.message}` });
     }
 }
@@ -88,7 +89,7 @@ exports.getOne = async (req, res) => {
         }
 
         return res.status(201).json({ message: 'Producto encontrado con éxito', status: 201, data: existingProduct });
-    } catch (error) {
+    } catch (err) {
         return res.status(400).json({ errorMessage: `Error al cargar todos los productos, ${err.message}` });
     }
 }

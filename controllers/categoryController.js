@@ -2,7 +2,7 @@ const Category = require("../models/Category");
 
 //crear nueva categoria
 exports.create = async (req, res) => {
-    const { name } = req.body;
+    const {  name, categoryCover, subCategories } = req.body;
 
     try {
         const existingCategory = await Category.findOne({ name })
@@ -10,7 +10,7 @@ exports.create = async (req, res) => {
             return res.status(400).json({ errorMessage: 'El nombre de la categoria ya existe' });
         }
         
-        const newCategory = new Category({ name });
+        const newCategory = new Category({ name, categoryCover, subCategories });
         await newCategory.save();
         return res.status(201).json({ message: 'Categoria registrada', status: 201 });
     } catch (err) {
@@ -20,7 +20,7 @@ exports.create = async (req, res) => {
 
 //actualizar categoria
 exports.update = async (req, res) => {
-    const { name } = req.body;
+    const { name, categoryCover, subCategories  } = req.body;
     const { id } = req.params;
 
     if (!id) {
@@ -34,6 +34,8 @@ exports.update = async (req, res) => {
         }
 
         existingCategory.name = name || existingCategory.name;
+        existingCategory.categoryCover = categoryCover || existingCategory.categoryCover;
+        existingCategory.subCategories  = subCategories  || existingCategory.subCategories;
         await existingCategory.save();
 
         return res.status(200).json({ message: 'Categoria actualizada con éxito', status: 200, data: existingCategory });
