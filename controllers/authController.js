@@ -3,9 +3,9 @@ const User = require("../models/User");
 const bcrypt = require('bcrypt');
 const saltRounds = 5;
 const jwt = require('jsonwebtoken');
-const nodeMailer = require('nodemailer')
+const nodeMailer = require('nodemailer');
 
-//registro de usuarios
+// Registro de usuários
 exports.register = async (req, res) => {
     const { name, lastname, username, password, email } = req.body;
 
@@ -15,54 +15,54 @@ exports.register = async (req, res) => {
                 { username: username },
                 { email: email }
             ]
-        })
+        });
         if (existedUser) {
-            return res.status(400).json({ message: 'El nombre de usuario o el correo electrónico ya están en uso' });
+            return res.status(400).json({ message: 'O nome de usuário ou o e-mail já estão em uso' });
         }
 
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const newUser = new User({ name, lastname, username, password: hashedPassword, email });
         await newUser.save();
-        return res.status(201).json({ message: 'Usuario registrado', status: 201 });
+        return res.status(201).json({ message: 'Usuário registrado com sucesso', status: 201 });
     } catch (err) {
-        return res.status(400).json({ message: `Error registrando usuario, ${err.message}` });
+        return res.status(400).json({ message: `Erro ao registrar o usuário: ${err.message}` });
     }
-}
-//login de usuarios
+};
+
+// Login de usuários
 exports.login = async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas: No existe ese usuario' });
+            return res.status(401).json({ message: 'Credenciais inválidas: Usuário não encontrado' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Credenciales inválidas: Contraseña incorrecta' });
+            return res.status(401).json({ message: 'Credenciais inválidas: Senha incorreta' });
         }
 
         const token = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.SECRET_KEY, { expiresIn: '30m' });
         return res.json({ token });
     } catch (error) {
-        return res.status(500).json({ message: 'Error en el servidor' })
+        return res.status(500).json({ message: 'Erro interno no servidor' });
     }
+};
 
-}
-
-//envio de correo para la recuperacion de contraseña
+// Envio de e-mail para recuperação de senha
 exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) {
-        return res.status(401).json({ message: 'Email no agregado - campo obligatorio' })
+        return res.status(401).json({ message: 'E-mail não informado - campo obrigatório' });
     }
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas' });
+            return res.status(401).json({ message: 'Credenciais inválidas' });
         }
-        const resetToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.SECRET_KEY, { expiresIn: '7m' })
+        const resetToken = jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.SECRET_KEY, { expiresIn: '7m' });
 
         const transporter = nodeMailer.createTransport({
             host: 'smtp.gmail.com',
@@ -76,52 +76,50 @@ exports.forgotPassword = async (req, res) => {
         const mailOptions = {
             from: process.env.USERMAIL,
             to: `${user.email}`,
-            subject: 'Recupera tu contraseña',
-            text: `Crea tu nueva contraseña ingresando al siguiente link: ${process.env.URL_FRONTEND}/resetPassword?token=${resetToken}, recuerda que este token sólo estara vigente por 7 min. Despúes tendras que volver a solicitarlo de nuevo.
+            subject: 'Recupere sua senha',
+            text: `Crie sua nova senha acessando o seguinte link: ${process.env.URL_FRONTEND}/resetPassword?token=${resetToken}. Lembre-se que esse token é válido por apenas 7 minutos. Depois disso, será necessário solicitar um novo.
     
-      Si no solicitaste el cambio de contraseña, ignora este correo. Tu contraseña continuará siendo la misma.
-      `
+Se você não solicitou a troca de senha, ignore este e-mail. Sua senha continuará a mesma.`
         };
 
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 return console.log(error);
             } else {
-                console.log('Correo enviado correctamente: ' + info.response);
+                console.log('E-mail enviado com sucesso: ' + info.response);
             }
         });
-        return res.status(201).json({ message: 'Token enviado a tu correo para cambiar contraseña' });
+        return res.status(201).json({ message: 'Token enviado para o seu e-mail para redefinição de senha' });
     } catch (error) {
-        return res.status(500).json({ message: 'Error en el servidor' });
+        return res.status(500).json({ message: 'Erro interno no servidor' });
     }
-}
+};
 
-//cambiar contraseña
+// Troca de senha
 exports.changePassword = async (req, res) => {
     const { newPassword } = req.body;
     const { email } = req.user;
 
     if (!email || !newPassword) {
-        return res.status(401).json({ message: 'Faltan credenciales por completar' })
+        return res.status(401).json({ message: 'Credenciais incompletas' });
     }
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'Usuario no encontrado' });
+            return res.status(400).json({ message: 'Usuário não encontrado' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-        user.password = hashedPassword
+        user.password = hashedPassword;
         await user.save();
-        res.status(201).json({ message: 'Contraseña cambiada existosamente' });
+        res.status(201).json({ message: 'Senha alterada com sucesso' });
     } catch (error) {
-        res.status(500).json({ errorMessage: `Error en el servidor cambiando contraseña: ${error.message}` });
+        res.status(500).json({ message: `Erro interno ao alterar senha: ${error.message}` });
     }
-}
+};
 
-//ruta privada
+// Rota protegida
 exports.dashboard = (req, res) => {
-    return res.status(201).json({ message: "Token valido y acceso permitido a la ruta protegida", data: req.user })
-}
-
+    return res.status(201).json({ message: "Token válido. Acesso permitido à rota protegida", data: req.user });
+};

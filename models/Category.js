@@ -27,7 +27,7 @@ const CategorySchema = new mongoose.Schema({
       validator: function(arr) {
         return arr.length > 0;  // Asegurar que hay al menos una subcategoría
       },
-      message: 'La categoría debe tener al menos una subcategoría'
+      message: 'A categoria deve ter pelo menos uma subcategoria'
     }
   }
 });

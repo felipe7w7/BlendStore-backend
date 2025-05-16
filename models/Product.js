@@ -48,7 +48,7 @@ const ProductSchema = new mongoose.Schema({
       validator: function(arr) {
         return arr.length > 0;  // Asegurar que hay al menos una combinación de talla y color con stock
       },
-      message: 'El producto debe tener al menos una combinación de talla y color disponible'
+      message: 'O produto deve ter pelo menos uma combinação de tamanho e cor disponível'
     },
     required: true
   },
