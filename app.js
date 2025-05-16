@@ -13,7 +13,7 @@ const app = express();
 
 // CORS: libera apenas para o frontend
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: process.env.URL_FRONTEND,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
