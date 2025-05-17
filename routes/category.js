@@ -1,17 +1,11 @@
-const express = require('express');
+import express from 'express';
+import categoryController from '../controllers/categoryController.js';
+
 const router = express.Router();
-const categoryController = require('../controllers/categoryController')
 
-//crear categorias
-router.post('/', categoryController.create)
+router.post('/', categoryController.create);
+router.put('/:id', categoryController.update);
+router.delete('/:id', categoryController.delete);
+router.get('/', categoryController.getAll);
 
-//actualizar categorias
-router.put('/:id', categoryController.update)
-
-//eliminar categorias
-router.delete('/:id', categoryController.delete)
-
-//mostrar todas las categorias
-router.get('/', categoryController.getAll)
-
-module.exports = router;
+export default router;
