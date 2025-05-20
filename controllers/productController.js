@@ -1,36 +1,36 @@
 const Product = require("../models/Product");
 
-// Criar novo produto
+// crear nuevos productos
 exports.create = async (req, res) => {
     const { name, category, subCategory, price, images, stockInfo, description } = req.body;
 
     try {
-        const existingProduct = await Product.findOne({ name });
+        const existingProduct = await Product.findOne({ name })
         if (existingProduct) {
-            return res.status(400).json({ errorMessage: 'Já existe um produto com esse nome' });
+            return res.status(400).json({ errorMessage: 'Ya existe un producto con ese nombre' });
         }
 
         const newProduct = new Product({ name, category, subCategory, price, images, stockInfo, description });
         await newProduct.save();
-        return res.status(201).json({ message: 'Novo produto registrado com sucesso', status: 201 });
+        return res.status(201).json({ message: 'Nuevo producto registrado', status: 201 });
     } catch (err) {
-        return res.status(400).json({ errorMessage: `Erro ao registrar produto: ${err.message}` });
+        return res.status(400).json({ errorMessage: `Error registrando productos, ${err.message}` });
     }
-};
+}
 
-// Atualizar produto
+// actualizar productos
 exports.update = async (req, res) => {
     const { name, category, subCategory, price, images, stockInfo, description } = req.body;
     const { id } = req.params;
 
     if (!id) {
-        return res.status(400).json({ errorMessage: 'O ID do produto é obrigatório' });
+        return res.status(400).json({ errorMessage: 'El Id del producto es requerido' });
     }
 
     try {
-        const existingProduct = await Product.findOne({ _id: id });
+        const existingProduct = await Product.findOne({ _id: id })
         if (!existingProduct) {
-            return res.status(404).json({ errorMessage: 'O produto que você está tentando editar não existe' });
+            return res.status(404).json({ errorMessage: 'El producto que intentas editar no existe' });
         }
 
         existingProduct.name = name || existingProduct.name;
@@ -38,59 +38,59 @@ exports.update = async (req, res) => {
         existingProduct.subCategory = subCategory || existingProduct.subCategory;
         existingProduct.price = price || existingProduct.price;
         existingProduct.images = images || existingProduct.images;
-        existingProduct.stockInfo = stockInfo || existingProduct.stockInfo;
-        existingProduct.description = description || existingProduct.description;
+        existingProduct.stockInfo  = stockInfo || existingProduct.stockInfo;
+        existingProduct.description  = description || existingProduct.description;
 
         await existingProduct.save();
 
-        return res.status(200).json({ message: 'Produto atualizado com sucesso', status: 200, data: existingProduct });
+        return res.status(200).json({ message: 'Producto actualizado con éxito', status: 200, data: existingProduct });
     } catch (err) {
-        return res.status(400).json({ errorMessage: `Erro ao atualizar o produto: ${err.message}` });
+        return res.status(400).json({ errorMessage: `Error actualizando el producto, ${err.message}` });
     }
-};
+}
 
-// Deletar produto
+// eliminar productos
 exports.delete = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-        return res.status(400).json({ errorMessage: 'O ID do produto é obrigatório' });
+        return res.status(400).json({ errorMessage: 'El Id del producto es requerido' });
     }
 
     try {
-        const product = await Product.findByIdAndDelete(id);
+        const product = await Product.findByIdAndDelete(id)
         if (!product) {
-            return res.status(404).json({ errorMessage: 'O produto que você está tentando deletar não existe' });
+            return res.status(404).json({ errorMessage: 'El producto que intentas eliminar no existe' });
         }
 
-        return res.status(200).json({ message: 'Produto deletado com sucesso', status: 200 });
+        return res.status(200).json({ message: 'Producto eliminado con éxito', status: 200});
     } catch (err) {
-        return res.status(400).json({ errorMessage: `Erro ao deletar o produto: ${err.message}` });
+        return res.status(400).json({ errorMessage: `Error actualizando el producto, ${err.message}` });
     }
-};
+}
 
-// Carregar todos os produtos
+//cargar todos los productos
 exports.getAll = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find()
         return res.status(201).json({ data: products, status: 201 });
     } catch (err) {
-        return res.status(400).json({ message: `Erro ao carregar todos os produtos: ${err.message}` });
+        return res.status(400).json({ message: `Error al cargar todos los productos, ${err.message}` });
     }
-};
+}
 
-// Carregar um produto
+//cargar un productos
 exports.getOne = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const existingProduct = await Product.findById(id);
+        const existingProduct = await Product.findById(id)
         if (!existingProduct) {
-            return res.status(404).json({ errorMessage: 'O produto buscado não existe' });
+            return res.status(404).json({ errorMessage: 'El producto buscado no existe' });
         }
 
-        return res.status(201).json({ message: 'Produto encontrado com sucesso', status: 201, data: existingProduct });
+        return res.status(201).json({ message: 'Producto encontrado con éxito', status: 201, data: existingProduct });
     } catch (err) {
-        return res.status(400).json({ errorMessage: `Erro ao buscar o produto: ${err.message}` });
+        return res.status(400).json({ errorMessage: `Error al cargar todos los productos, ${err.message}` });
     }
-};
+}

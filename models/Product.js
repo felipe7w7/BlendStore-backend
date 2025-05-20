@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Definir las tallas permitidas
 const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XXL', '4', '5', '6', '7', '8', '9', '28', '30', '32', '34', '36', '38', '40', '42', 'none'];
 
 const stockSchema = new mongoose.Schema({
@@ -47,7 +48,7 @@ const ProductSchema = new mongoose.Schema({
       validator: function(arr) {
         return arr.length > 0;  // Asegurar que hay al menos una combinación de talla y color con stock
       },
-      message: 'O produto deve ter pelo menos uma combinação de tamanho e cor disponível'
+      message: 'El producto debe tener al menos una combinación de talla y color disponible'
     },
     required: true
   },

@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
   const token = req.headers['authorization'];
   if (!token) {
-    return res.status(403).json({ errorMessage: 'Token necessário para a sessão' });
+    return res.status(403).json({ errorMessage: 'Token requerido para la sesión' });
   }
 
   jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
@@ -15,4 +15,4 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-export default verifyToken;
+module.exports = verifyToken;
